@@ -1,93 +1,78 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Донат – SurvivalServer</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: url('https://resourcepack.net/fl/images/2022/11/Complementary-Reimagined-Shaders-5.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: #fff;
-    }
-    .bg-overlay {
-      background: rgba(0, 0, 0, 0.7);
-    }
-    .card:hover {
-      transform: translateY(-8px);
-      transition: 0.3s;
-    }
-    .btn:hover {
-      transform: scale(1.05);
-      transition: 0.3s;
-    }
-  </style>
-</head>
-<body class="text-white font-sans" x-data="{ nickname: '', selected: null, ranks: [
-  {name: 'BADBOY', desc: 'Дозволяє використовувати /fly на сервері.'},
-  {name: 'VIP', desc: 'Кольоровий нік, стартовий набір VIP та /hat.'},
-  {name: 'LEGEND', desc: 'Флай, унікальний префікс, більше RTP та швидший телепорт.'},
-  {name: 'OVERLORD', desc: 'Максимальні привілеї: флай, /god, кастомний префікс, доступ до приватних івентів.'}
-]}">
+import base64
+import hashlib
+import json
+from flask import Flask, request, jsonify
+from mcrcon import MCRcon
 
-  <!-- Навбар -->
-  <nav class="bg-overlay shadow-lg">
-    <div class="container mx-auto flex justify-between items-center p-4">
-      <h1 class="text-xl font-bold">Minecraft Server</h1>
-      <div class="space-x-6">
-        <a href="index.html" class="hover:text-green-400">Головна</a>
-        <a href="donate.html" class="hover:text-green-400">Донат</a>
-        <a href="https://discord.gg/yourdiscord" target="_blank" class="hover:text-green-400">Discord</a>
-      </div>
-    </div>
-  </nav>
+app = Flask(__name__)
 
-  <!-- Донат -->
-  <section id="donate" class="container mx-auto p-10 bg-overlay rounded-2xl mt-10 max-w-6xl">
-    <h2 class="text-3xl font-bold text-center mb-6">Привілеї</h2>
+# 🔑 LiqPay ключі (з особистого кабінету LiqPay)
+LIQPAY_PUBLIC = "sandbox_i28524890692"
+LIQPAY_PRIVATE = "sandbox_N1zqYl44YbkLIpj73bEujO3kYSpdDiwMooSpyLAZ"
 
-    <!-- Поле для ніку -->
-    <div class="text-center mb-6">
-      <input x-model="nickname" type="text" placeholder="Введи свій нікнейм"
-             class="px-4 py-2 rounded-lg text-black w-64">
-    </div>
+# 🎮 RCON дані
+RCON_HOST = "server228.zapto.org"
+RCON_PORT = 25575
+RCON_PASSWORD = "Vlad20137777bo208goasfjmJkhgJn"
 
-    <!-- Карточки донату -->
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <template x-for="(rank, index) in ranks" :key="index">
-        <div class="card bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col justify-between">
-          <div>
-            <h3 class="text-2xl font-bold mb-2" x-text="rank.name"></h3>
-            <p class="text-gray-300" x-text="rank.desc"></p>
-          </div>
-          <button @click="selected = rank"
-                  class="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold btn">
-            Купити
-          </button>
-        </div>
-      </template>
-    </div>
+# 🎁 Налаштування донат-рангів
+DONATE_PACKAGES = {
+    50: "BADBOY",      # 50 грн → BADBOY
+    100: "VIP",        # 100 грн → VIP
+    250: "LEGEND",     # 250 грн → LEGEND
+    500: "OVERLORD"    # 500 грн → OVERLORD
+}
 
-    <!-- Вибраний донат -->
-    <div class="mt-10 text-center" x-show="selected">
-      <h3 class="text-2xl font-bold mb-4">Ти вибрав:</h3>
-      <p class="text-lg">Нік: <span class="text-green-400" x-text="nickname || 'Не вказано'"></span></p>
-      <p class="mt-2" x-text="selected.desc"></p>
-      <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold btn">
-        Оплатити
-      </button>
-    </div>
-  </section>
 
-  <!-- Футер -->
-  <footer class="bg-overlay text-center p-4 mt-10">
-    <p>© 2025 Minecraft Server. Усі права захищено.</p>
-  </footer>
+def liqpay_sign(data: str) -> str:
+    """Створює підпис для перевірки callback від LiqPay"""
+    return base64.b64encode(
+        hashlib.sha1((LIQPAY_PRIVATE + data + LIQPAY_PRIVATE).encode()).digest()
+    ).decode()
 
-</body>
-</html>
+
+@app.route("/donate", methods=["POST"])
+def donate():
+    """Обробка callback від LiqPay"""
+    data = request.form.get("data")
+    signature = request.form.get("signature")
+
+    if not data or not signature:
+        return jsonify({"error": "no data"}), 400
+
+    # перевірка підпису
+    if signature != liqpay_sign(data):
+        return jsonify({"error": "bad signature"}), 400
+
+    # розпаковуємо JSON від LiqPay
+    decoded = json.loads(base64.b64decode(data).decode())
+    print("📩 LiqPay callback:", decoded)
+
+    status = decoded.get("status")
+    amount = int(float(decoded.get("amount", 0)))
+    nickname = decoded.get("info")  # з `info` передаємо нікнейм
+
+    if status == "success":
+        rank = DONATE_PACKAGES.get(amount)
+
+        if not rank:
+            return jsonify({"error": f"No rank for {amount} UAH"}), 400
+
+        try:
+            # Підключення до Minecraft через RCON
+            with MCRcon(RCON_HOST, RCON_PASSWORD, port=RCON_PORT) as mcr:
+                command = f"lp user {nickname} parent set {rank}"
+                resp = mcr.command(command)
+                print(f"✅ Видано {rank} гравцю {nickname}: {resp}")
+
+            return jsonify({"status": "success", "nickname": nickname, "rank": rank})
+
+        except Exception as e:
+            print("❌ RCON error:", str(e))
+            return jsonify({"error": "RCON error", "details": str(e)}), 500
+
+    return jsonify({"status": "not paid"}), 200
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
