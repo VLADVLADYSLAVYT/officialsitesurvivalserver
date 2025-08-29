@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SurvivalServer – Головна</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://i.ytimg.com/vi/eUL8EZChp_I/maxresdefault.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+    .bg-overlay {
+      background: rgba(0, 0, 0, 0.6);
+    }
+    .btn:hover {
+      transform: scale(1.05);
+      transition: 0.3s;
+    }
+  </style>
+</head>
+<body class="text-white">
+
+  <!-- Навбар -->
+  <nav class="bg-overlay shadow-lg">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-bold">Minecraft Server</h1>
+      <div class="space-x-6">
+        <a href="index.html" class="hover:text-green-400">Головна</a>
+        <a href="donate.html" class="hover:text-green-400">Донат</a>
+        <a href="rules.html" class="hover:text-green-400">Правила</a>
+        <a href="https://discord.gg/yourdiscord" target="_blank" class="hover:text-green-400">Discord</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Вітальний банер -->
+  <section class="container mx-auto text-center mt-20 bg-overlay rounded-2xl p-10 max-w-4xl">
+    <h2 class="text-4xl font-bold mb-4">Ласкаво просимо на наш сервер!</h2>
+    <p class="text-lg mb-6">Версія: <span class="text-green-400">Minecraft Java 1.21.8</span></p>
+    <p class="text-lg mb-6">IP: <span class="text-green-400">Server228.zapto.org:8908</span></p>
+    <a href="donate.html" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-bold btn">Донат</a>
+  </section>
+
+  <!-- Інформаційний блок -->
+  <section class="container mx-auto text-center mt-16 bg-overlay rounded-2xl p-10 max-w-6xl">
+    <h3 class="text-3xl font-bold mb-4">Що чекає на тебе:</h3>
+    <ul class="list-disc list-inside text-lg space-y-2">
+      <li>Атмосферний Minecraft світ</li>
+      <li>Унікальні привілеї та ранги на донат-сторінці</li>
+      <li>Дружня спільнота та Discord</li>
+      <li>Регулярні оновлення</li>
+    </ul>
+  </section>
+
+  <!-- Футер -->
+  <footer class="bg-overlay text-center p-4 mt-16">
+    <p>© 2025 Minecraft Server. Усі права захищено.</p>
+  </footer>
+
+</body>
+</html>
