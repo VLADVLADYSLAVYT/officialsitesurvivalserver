@@ -79,41 +79,45 @@
       <p class="mt-2" x-text="selected.desc"></p>
       <p class="mt-2 font-bold text-green-400" x-text="selected.price + ' грн'"></p>
       <button 
-        @click="if(nickname){ 
-          let form = document.createElement('form');
-          form.method = 'POST';
-          form.action = 'https://www.liqpay.ua/api/3/checkout';
-          form.acceptCharset = 'utf-8';
+  @click="if(nickname){ 
+    fetch('https://web-production-0323.up.railway.app/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: selected.price,
+        description: selected.name,
+        nickname: nickname
+      })
+    })
+    .then(res => res.json())
+    .then(res => {
+      let form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://www.liqpay.ua/api/3/checkout';
+      form.acceptCharset = 'utf-8';
 
-          // дані для LiqPay
-          let jsonData = btoa(JSON.stringify({
-            public_key: 'sandbox_i28524890692',
-            action: 'pay',
-            amount: selected.price,
-            currency: 'UAH',
-            description: selected.name,
-            order_id: Date.now(),
-            version: '3',
-            info: nickname,
-            server_url: 'https://web-production-0323.up.railway.app/'
-          }));
+      let inputData = document.createElement('input');
+      inputData.type = 'hidden';
+      inputData.name = 'data';
+      inputData.value = res.data;
 
-          let signature = 'https://web-production-0323.up.railway.app/'; // краще генерувати на бекенді (можна на Flask додати /liqpay-sign)
+      let inputSig = document.createElement('input');
+      inputSig.type = 'hidden';
+      inputSig.name = 'signature';
+      inputSig.value = res.signature;
 
-          let inputData = document.createElement('input');
-          inputData.type = 'hidden'; inputData.name = 'data'; inputData.value = jsonData;
-
-          let inputSig = document.createElement('input');
-          inputSig.type = 'hidden'; inputSig.name = 'signature'; inputSig.value = signature;
-
-          form.appendChild(inputData);
-          form.appendChild(inputSig);
-          document.body.appendChild(form);
-          form.submit();
-        } else { alert('Введи свій нік!'); }"
-        class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold btn">
-        Оплатити
-      </button>
+      form.appendChild(inputData);
+      form.appendChild(inputSig);
+      document.body.appendChild(form);
+      form.submit();
+    });
+  } else { 
+    alert('Введи свій нік!'); 
+  }"
+  class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold btn">
+  Оплатити
+</button>
+    </button>
     </div>
   </section>
 
@@ -124,5 +128,6 @@
 
 </body>
 </html>
+
 
 
