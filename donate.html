@@ -98,7 +98,7 @@
             server_url: 'https://web-production-0323.up.railway.app/'
           }));
 
-          let signature = ''; // краще генерувати на бекенді (можна на Flask додати /liqpay-sign)
+          let signature = 'https://web-production-0323.up.railway.app/'; // краще генерувати на бекенді (можна на Flask додати /liqpay-sign)
 
           let inputData = document.createElement('input');
           inputData.type = 'hidden'; inputData.name = 'data'; inputData.value = jsonData;
@@ -124,4 +124,5 @@
 
 </body>
 </html>
+
 
