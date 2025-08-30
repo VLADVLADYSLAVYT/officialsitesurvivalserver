@@ -1,115 +1,74 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" x-data="donateApp()">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Донат – SurvivalServer</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
-  <style>
-    body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: url('https://resourcepack.net/fl/images/2022/11/Complementary-Reimagined-Shaders-5.jpg') no-repeat center center fixed; background-size: cover; color: #fff; }
-    .bg-overlay { background: rgba(0, 0, 0, 0.7); }
-    .card:hover { transform: translateY(-8px); transition: 0.3s; }
-    .btn:hover { transform: scale(1.05); transition: 0.3s; }
-  </style>
+  <title>Donate</title>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
-<body x-data="donateApp">
+<body class="bg-gray-900 text-white p-6">
 
-  <nav class="bg-overlay shadow-lg">
-    <div class="container mx-auto flex justify-between items-center p-4">
-      <h1 class="text-xl font-bold">Minecraft Server</h1>
-      <div class="space-x-6">
-        <a href="index.html" class="hover:text-green-400">Головна</a>
-        <a href="donate.html" class="hover:text-green-400">Донат</a>
-        <a href="https://discord.gg/yourdiscord" target="_blank" class="hover:text-green-400">Discord</a>
-      </div>
-    </div>
-  </nav>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Приклад кнопок -->
+    <button 
+      class="bg-gray-800 p-4 rounded-xl hover:bg-green-600 transition"
+      @click="selectOption('vip')">
+      VIP
+    </button>
 
-  <section class="container mx-auto p-10 bg-overlay rounded-2xl mt-10 max-w-6xl">
-    <h2 class="text-3xl font-bold text-center mb-6">Привілеї</h2>
+    <button 
+      class="bg-gray-800 p-4 rounded-xl hover:bg-green-600 transition"
+      @click="selectOption('premium')">
+      Premium
+    </button>
+  </div>
 
-    <div class="text-center mb-6">
-      <input x-model="nickname" type="text" placeholder="Введи свій нікнейм" class="px-4 py-2 rounded-lg text-black w-64">
-    </div>
+  <!-- Вибраний товар -->
+  <div class="mt-6 p-4 bg-gray-800 rounded-xl" x-show="selected">
+    <h2 class="text-xl font-bold" x-text="selected?.title"></h2>
+    <p class="mt-2 text-green-400 font-bold" x-text="selected ? selected.price + ' грн' : ''"></p>
+    <p class="mt-1 text-gray-300" x-text="selected ? selected.desc : ''"></p>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <template x-for="rank in ranks" :key="rank.name">
-        <div class="card bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col justify-between">
-          <div>
-            <h3 class="text-2xl font-bold mb-2" x-text="rank.name"></h3>
-            <p class="text-gray-300" x-text="rank.desc"></p>
-            <p class="mt-2 font-bold text-green-400" x-text="rank.price + ' грн'"></p>
-          </div>
-          <button @click="selectRank(rank)" class="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold btn">Купити</button>
-        </div>
-      </template>
-    </div>
-
-    <div class="mt-10 text-center" x-show="selected">
-      <h3 class="text-2xl font-bold mb-4">Ти вибрав:</h3>
-      <p class="text-lg">Нік: <span class="text-green-400" x-text="nickname || 'Не вказано'"></span></p>
-      <p class="mt-2" x-text="selected.desc"></p>
-      <p class="mt-2 font-bold text-green-400" x-text="selected.price + ' грн'"></p>
-      <button @click="pay()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-bold btn">Оплатити</button>
-    </div>
-  </section>
-
-  <footer class="bg-overlay text-center p-4 mt-10">
-    <p>© 2025 Minecraft Server. Усі права захищено.</p>
-  </footer>
+    <button 
+      class="mt-4 px-6 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600"
+      @click="pay">
+      Оплатити
+    </button>
+  </div>
 
   <script>
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('donateApp', () => ({
-        nickname: '',
+    function donateApp() {
+      return {
         selected: null,
-        ranks: [
-          {name: 'BADBOY', price: 50, desc: 'Дозволяє використовувати /fly на сервері.'},
-          {name: 'VIP', price: 100, desc: 'Кольоровий нік, стартовий набір VIP та /hat.'},
-          {name: 'LEGEND', price: 200, desc: 'Флай, унікальний префікс, більше RTP та швидший телепорт.'},
-          {name: 'OVERLORD', price: 500, desc: 'Максимальні привілеї: флай, /god, кастомний префікс, доступ до приватних івентів.'}
-        ],
-        selectRank(rank) { this.selected = rank; },
-        pay() {
-          if(!this.nickname){ alert('Введи свій нік!'); return; }
-          if(!this.selected){ alert('Оберіть привілей!'); return; }
+        options: {
+          vip: { title: "VIP", price: 50, desc: "VIP доступ" },
+          premium: { title: "Premium", price: 100, desc: "Premium доступ" }
+        },
+        selectOption(option) {
+          this.selected = this.options[option];
+        },
+        async pay() {
+          if (!this.selected) return;
 
-          fetch('https://web-production-0323.up.railway.app/create-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              amount: this.selected.price,
-              description: this.selected.name,
-              nickname: this.nickname
-            })
-          })
-          .then(res => res.json())
-          .then(res => {
-            let form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'https://www.liqpay.ua/api/3/checkout';
-            form.acceptCharset = 'utf-8';
+          try {
+            let res = await fetch("https://web-production-0323.up.railway.app/create-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ amount: this.selected.price, description: this.selected.title })
+            });
 
-            let inputData = document.createElement('input');
-            inputData.type = 'hidden';
-            inputData.name = 'data';
-            inputData.value = res.data;
-
-            let inputSig = document.createElement('input');
-            inputSig.type = 'hidden';
-            inputSig.name = 'signature';
-            inputSig.value = res.signature;
-
-            form.appendChild(inputData);
-            form.appendChild(inputSig);
-            document.body.appendChild(form);
-            form.submit();
-          })
-          .catch(err => console.error(err));
+            let data = await res.json();
+            if (data && data.payment_url) {
+              window.location.href = data.payment_url;
+            } else {
+              alert("Помилка при створенні платежу");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Сервер не відповідає");
+          }
         }
-      }))
-    });
+      }
+    }
   </script>
 
 </body>
