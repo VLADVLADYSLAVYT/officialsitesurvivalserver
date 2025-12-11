@@ -17,7 +17,7 @@
 
   <nav class="bg-overlay shadow-lg">
     <div class="container mx-auto flex justify-between items-center p-4">
-      <h1 class="text-xl font-bold">Minecraft Server</h1>
+      <h1 class="text-xl font-bold">AshBloom</h1>
       <div class="space-x-6">
         <a href="index.html" class="hover:text-green-400">Головна</a>
         <a href="donate.html" class="hover:text-green-400">Донат</a>
@@ -27,9 +27,9 @@
   </nav>
 
   <section class="container mx-auto p-10 bg-overlay rounded-2xl mt-10 max-w-6xl">
-    <h2 class="text-3xl font-bold text-center mb-6">Привілеї</h2>
-
-    <div class="text-center mb-6">
+    <h2 class="text-3xl font-bold text-center mb-6">Привілегії</h2>
+    <h2 class="text-3xl font-bold text-center mb-6">Донати наразі не працюють!!!</h2>
+      <div class="text-center mb-6">
       <input x-model="nickname" type="text" placeholder="Введи свій нікнейм" class="px-4 py-2 rounded-lg text-black w-64">
     </div>
 
@@ -65,10 +65,8 @@
         nickname: '',
         selected: null,
         ranks: [
-          {name: 'BADBOY', price: 50, desc: 'Дозволяє використовувати /fly на сервері.'},
-          {name: 'VIP', price: 100, desc: 'Кольоровий нік, стартовий набір VIP та /hat.'},
-          {name: 'LEGEND', price: 200, desc: 'Флай, унікальний префікс, більше RTP та швидший телепорт.'},
-          {name: 'OVERLORD', price: 500, desc: 'Максимальні привілеї: флай, /god, кастомний префікс, доступ до приватних івентів.'}
+          {name: 'BADBOY', price: 55, desc: 'Ви отримуєте такі команди: /fly, /enderchest, /feed кожні 5 хвилин, /armor hide.show.'},
+          {name: 'Valkirye', price: 75, desc: 'Ви отримуєте такі команди: /fly, /anvil, /craft, /enderchest, /feed кожні 5 хвилин, /armor hide.show, /feel.'}
         ],
         selectRank(rank) { this.selected = rank; },
         pay() {
